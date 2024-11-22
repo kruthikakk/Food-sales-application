@@ -14,4 +14,4 @@ Data Display
 
 Comprehensive sales information Formatted currency values Sortable columns Pagination support
 
-🚀 Live Demo Access the live dashboard here: [Your Streamlit URL after deployment]
+🚀 Live Demo Access the live dashboard here:
