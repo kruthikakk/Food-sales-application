@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Updated CSS with fixed styling
+# Updated CSS with fixed styling and bounce animation
 st.markdown("""
     <style>
     /* Main background color */
@@ -43,14 +43,24 @@ st.markdown("""
     .food-logo {
         font-size: 3.5rem;
         animation: float 3s ease-in-out infinite;
+        margin-bottom: 10px;
     }
     
-    /* Welcome text styles */
+    /* Welcome text styles with bounce animation */
     .welcome-text {
         color: white;
         margin: 0;
         font-size: 2.5rem;
         font-weight: 900;
+        animation: bounce 1s ease-in-out;
+    }
+    
+    /* Add bounce keyframes animation */
+    @keyframes bounce {
+        0% { transform: translateY(-100px); opacity: 0; }
+        50% { transform: translateY(20px); }
+        75% { transform: translateY(-10px); }
+        100% { transform: translateY(0); opacity: 1; }
     }
     
     @keyframes float {
@@ -202,7 +212,7 @@ if df is not None:
             st.markdown('<p class="date-input-label">Start Date</p>', unsafe_allow_html=True)
             start_date = st.date_input(
                 "",
-                value=min_date,
+                value=datetime.strptime("01/01/2022", "%m/%d/%Y").date(),
                 min_value=min_date,
                 max_value=max_date,
                 key='start_date',
@@ -214,9 +224,7 @@ if df is not None:
             st.markdown('<p class="date-input-label">End Date</p>', unsafe_allow_html=True)
             end_date = st.date_input(
                 "",
-                value=max_date,
-                #  value=datetime.strptime("12/30/2023", "%m/%d/%Y").date(),
-                min_value=min_date,
+                value=datetime.strptime("12/30/2023", "%m/%d/%Y").date(),
                 max_value=max_date,
                 key='end_date',
                 label_visibility="collapsed",
