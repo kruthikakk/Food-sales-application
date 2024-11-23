@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
 # Page configuration
 st.set_page_config(
@@ -23,12 +24,11 @@ st.markdown("""
     
     /* Header styles */
     .header {
-        background: linear-gradient(135deg, #1e88e5, #1565c0);
+        background-color: #3B82F6;
         padding: 1.5rem;
         border-radius: 8px;
         margin-bottom: 1.5rem;
         text-align: center;
-        overflow: hidden;
     }
     
     /* Logo container styles */
@@ -37,57 +37,26 @@ st.markdown("""
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
     }
     
     .food-logo {
-        font-size: 3rem;
+        font-size: 3.5rem;
         animation: float 3s ease-in-out infinite;
     }
     
-    @keyframes float {
-        0% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-10px);
-        }
-        100% {
-            transform: translateY(0px);
-        }
-    }
-    
-    /* Bouncing text animation */
-    .bouncing-text {
-        display: inline-block;
-        margin: 0;
+    /* Welcome text styles */
+    .welcome-text {
         color: white;
-        font-size: 2rem;
-        font-weight: bold;
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 900;
     }
     
-    .letter {
-        display: inline-block;
-        opacity: 0;
-        animation: bounce-in 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-    }
-    
-    @keyframes bounce-in {
-        0% {
-            transform: translateY(-100px);
-            opacity: 0;
-        }
-        60% {
-            transform: translateY(20px);
-            opacity: 1;
-        }
-        80% {
-            transform: translateY(-10px);
-        }
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
     }
     
     /* Filter group styles */
@@ -104,8 +73,62 @@ st.markdown("""
     }
     
     .filter-group {
-        width: 60%;
+        width: 100%;
         text-align: center;
+        padding: 10px;
+    }
+    
+    /* Date range container */
+    .date-range-container {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Filter label styling */
+    .filter-label {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        text-align: center;
+        font-family: sans-serif;
+    }
+
+    /* Date input styling */
+    [data-testid="stDateInput"] label {
+        font-size: 1.1rem !important;
+        font-weight: 800 !important;
+        color: white !important;
+    }
+
+    /* Style for the date input container */
+    [data-testid="stDateInput"] {
+        margin-bottom: 0.5rem;
+    }
+
+    .date-input-label {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        text-align: center;
+        font-family: sans-serif;
+    }
+
+    /* Style for the apply button */
+    [data-testid="stButton"] {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    /* Custom styles for date input */
+    [data-testid="stDateInput"] input {
+        font-size: 1.1rem !important;
+        text-align: center !important;
+        color: #333 !important;
     }
     
     /* Hide Streamlit branding */
@@ -119,15 +142,15 @@ st.markdown("""
         padding: 1rem;
         border-radius: 8px;
     }
-    
-    /* Filter label styling */
-    .filter-label {
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 800;
-        margin-bottom: 8px;
+
+    /* Info message styling */
+    [data-testid="stInfo"] {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 8px;
         text-align: center;
-        font-family: sans-serif;
+        font-size: 1.1rem;
+        margin-top: 2rem;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -136,75 +159,73 @@ st.markdown("""
 @st.cache_data
 def load_data():
     try:
-        return pd.read_csv('sampledatafoodsales_analysis.csv')
+        # Read the specific sheet 'FoodSales' from the Excel file
+        df = pd.read_excel('sampledatafoodsales_analysis .xlsx', sheet_name='FoodSales')
+        # Convert date column to datetime
+        df['Date'] = pd.to_datetime(df['Date'])
+        return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return None
 
+# Load the initial data for getting filter values
 df = load_data()
 
 if df is not None:
-    # Header with food logo and bouncing text
+    # Header with food logo and welcome text
     st.markdown("""
         <div class="header">
             <div class="logo-container">
                 <div class="food-logo">🍽️</div>
-                <h1 class="bouncing-text">
-                    <span class="letter" style="animation-delay: 0.1s">W</span>
-                    <span class="letter" style="animation-delay: 0.2s">E</span>
-                    <span class="letter" style="animation-delay: 0.3s">L</span>
-                    <span class="letter" style="animation-delay: 0.4s">C</span>
-                    <span class="letter" style="animation-delay: 0.5s">O</span>
-                    <span class="letter" style="animation-delay: 0.6s">M</span>
-                    <span class="letter" style="animation-delay: 0.7s">E</span>
-                    <span class="letter" style="animation-delay: 0.8s">&nbsp;</span>
-                    <span class="letter" style="animation-delay: 0.9s">T</span>
-                    <span class="letter" style="animation-delay: 1.0s">O</span>
-                    <span class="letter" style="animation-delay: 1.1s">&nbsp;</span>
-                    <span class="letter" style="animation-delay: 1.2s">F</span>
-                    <span class="letter" style="animation-delay: 1.3s">O</span>
-                    <span class="letter" style="animation-delay: 1.4s">O</span>
-                    <span class="letter" style="animation-delay: 1.5s">D</span>
-                    <span class="letter" style="animation-delay: 1.6s">&nbsp;</span>
-                    <span class="letter" style="animation-delay: 1.7s">S</span>
-                    <span class="letter" style="animation-delay: 1.8s">A</span>
-                    <span class="letter" style="animation-delay: 1.9s">L</span>
-                    <span class="letter" style="animation-delay: 2.0s">E</span>
-                    <span class="letter" style="animation-delay: 2.1s">S</span>
-                    <span class="letter" style="animation-delay: 2.2s">&nbsp;</span>
-                    <span class="letter" style="animation-delay: 2.3s">D</span>
-                    <span class="letter" style="animation-delay: 2.4s">A</span>
-                    <span class="letter" style="animation-delay: 2.5s">S</span>
-                    <span class="letter" style="animation-delay: 2.6s">H</span>
-                    <span class="letter" style="animation-delay: 2.7s">B</span>
-                    <span class="letter" style="animation-delay: 2.8s">O</span>
-                    <span class="letter" style="animation-delay: 2.9s">A</span>
-                    <span class="letter" style="animation-delay: 3.0s">R</span>
-                    <span class="letter" style="animation-delay: 3.1s">D</span>
-                </h1>
+                <h1 class="welcome-text">Welcome to Food Sales Dashboard</h1>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
+    # Initialize session state for tracking filter selections
+    if 'filter_applied' not in st.session_state:
+        st.session_state.filter_applied = False
+
+    # Get min and max dates from the dataset
+    min_date = df['Date'].min().date()
+    max_date = df['Date'].max().date()
+
     # Filters
     col1, col2, col3 = st.columns(3)
     
-    # Get unique dates
-    dates = sorted(df['Date'].unique())
-    
     with col1:
         st.markdown('<div class="filter-group">', unsafe_allow_html=True)
-        st.markdown('<p class="filter-label">Date</p>', unsafe_allow_html=True)
-        selected_date = st.selectbox(
-            'Select Date',
-            options=['All Dates'] + dates,
-            key='date',
-            label_visibility="collapsed"
-        )
+        
+        date_col1, date_col2 = st.columns(2)
+        
+        with date_col1:
+            st.markdown('<p class="date-input-label">Start Date</p>', unsafe_allow_html=True)
+            start_date = st.date_input(
+                "",
+                value=min_date,
+                min_value=min_date,
+                max_value=max_date,
+                key='start_date',
+                label_visibility="collapsed",
+                format="MM/DD/YYYY"
+            )
+            
+        with date_col2:
+            st.markdown('<p class="date-input-label">End Date</p>', unsafe_allow_html=True)
+            end_date = st.date_input(
+                "",
+                value=max_date,
+                #  value=datetime.strptime("12/30/2023", "%m/%d/%Y").date(),
+                min_value=min_date,
+                max_value=max_date,
+                key='end_date',
+                label_visibility="collapsed",
+                format="MM/DD/YYYY"
+            )
 
     with col2:
         st.markdown('<div class="filter-group">', unsafe_allow_html=True)
-        st.markdown('<p class="filter-label">City:</p>', unsafe_allow_html=True)
+        st.markdown('<p class="filter-label">City</p>', unsafe_allow_html=True)
         city = st.selectbox(
             'City',
             options=['All Cities'] + sorted(df['City'].unique().tolist()),
@@ -214,7 +235,7 @@ if df is not None:
 
     with col3:
         st.markdown('<div class="filter-group">', unsafe_allow_html=True)
-        st.markdown('<p class="filter-label">Category:</p>', unsafe_allow_html=True)
+        st.markdown('<p class="filter-label">Category</p>', unsafe_allow_html=True)
         category = st.selectbox(
             'Category',
             options=['All Categories'] + sorted(df['Category'].unique().tolist()),
@@ -222,38 +243,54 @@ if df is not None:
             label_visibility="collapsed"
         )
 
-    # Filter data
-    filtered_df = df.copy()
+    # Add Apply Filter button
+    col1, col2, col3 = st.columns([4, 2, 4])
+    with col2:
+        if st.button('Search', type='primary'):
+            st.session_state.filter_applied = True
 
-    if selected_date != 'All Dates':
-        filtered_df = filtered_df[filtered_df['Date'] == selected_date]
-    if city != 'All Cities':
-        filtered_df = filtered_df[filtered_df['City'] == city]
-    if category != 'All Categories':
-        filtered_df = filtered_df[filtered_df['Category'] == category]
+    # Only show data when filters are applied
+    if st.session_state.filter_applied:
+        # Filter data
+        filtered_df = df.copy()
 
-    # Display data table
-    st.dataframe(
-        filtered_df,
-        column_config={
-            "ID": st.column_config.TextColumn("ID"),
-            "Date": st.column_config.TextColumn("Date"),
-            "Region": st.column_config.TextColumn("Region"),
-            "City": st.column_config.TextColumn("City"),
-            "Category": st.column_config.TextColumn("Category"),
-            "Product": st.column_config.TextColumn("Product"),
-            "Qty": st.column_config.NumberColumn("Qty"),
-            "UnitPrice": st.column_config.NumberColumn(
-                "Unit Price ($)",
-                format="$%.2f"
-            ),
-            "TotalPrice": st.column_config.NumberColumn(
-                "Total Price ($)",
-                format="$%.2f"
-            )
-        },
-        hide_index=True,
-        use_container_width=True
-    )
+        # Apply date filter
+        filtered_df = filtered_df[
+            (filtered_df['Date'].dt.date >= start_date) & 
+            (filtered_df['Date'].dt.date <= end_date)
+        ]
+        
+        if city != 'All Cities':
+            filtered_df = filtered_df[filtered_df['City'] == city]
+        if category != 'All Categories':
+            filtered_df = filtered_df[filtered_df['Category'] == category]
+
+        # Display data table
+        st.dataframe(
+            filtered_df,
+            column_config={
+                "ID": st.column_config.TextColumn("ID"),
+                "Date": st.column_config.DateColumn(
+                    "Date",
+                    format="MM/DD/YYYY"
+                ),
+                "Region": st.column_config.TextColumn("Region"),
+                "City": st.column_config.TextColumn("City"),
+                "Category": st.column_config.TextColumn("Category"),
+                "Product": st.column_config.TextColumn("Product"),
+                "Qty": st.column_config.NumberColumn("Qty"),
+                "UnitPrice": st.column_config.NumberColumn(
+                    "Unit Price ($)",
+                    format="$%.2f"
+                ),
+                "TotalPrice": st.column_config.NumberColumn(
+                    "Total Price ($)",
+                    format="$%.2f"
+                )
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+
 else:
-    st.error("Unable to load data. Please check if the CSV file exists in the correct location.")
+    st.error("Unable to load data. Please check if the Excel file exists in the correct location.")
