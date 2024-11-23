@@ -14,4 +14,5 @@ Data Display
 
 Comprehensive sales information Formatted currency values Sortable columns Pagination support
 
-🚀 Live Demo Access the live dashboard here:
+🚀 Live Demo Access the live dashboard here: 
+https://food-sales-application-yanrzucjj49y7svexafnf8.streamlit.app/
