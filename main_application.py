@@ -197,8 +197,8 @@ if df is not None:
         st.session_state.filter_applied = False
 
     # Get min and max dates from the dataset
-    min_date = df['Date'].min().date()
-    max_date = df['Date'].max().date()
+    min_date = datetime(2018, 1, 1).date()  # Set minimum date to January 1, 2018
+    max_date = datetime(2023, 12, 31).date()  # Set maximum date to December 31, 2023
 
     # Filters
     col1, col2, col3 = st.columns(3)
@@ -212,7 +212,7 @@ if df is not None:
             st.markdown('<p class="date-input-label">Start Date</p>', unsafe_allow_html=True)
             start_date = st.date_input(
                 "",
-                value=datetime.strptime("01/01/2022", "%m/%d/%Y").date(),
+                value=datetime(2018, 1, 1).date(),  # Set default start date to January 1, 2018
                 min_value=min_date,
                 max_value=max_date,
                 key='start_date',
@@ -224,7 +224,8 @@ if df is not None:
             st.markdown('<p class="date-input-label">End Date</p>', unsafe_allow_html=True)
             end_date = st.date_input(
                 "",
-                value=datetime.strptime("12/30/2023", "%m/%d/%Y").date(),
+                value=datetime(2023, 12, 31).date(),  # Set default end date to December 31, 2023
+                min_value=start_date,  # Ensure end date is not before start date
                 max_value=max_date,
                 key='end_date',
                 label_visibility="collapsed",
@@ -257,48 +258,52 @@ if df is not None:
         if st.button('Search', type='primary'):
             st.session_state.filter_applied = True
 
-    # Only show data when filters are applied
-    if st.session_state.filter_applied:
-        # Filter data
-        filtered_df = df.copy()
+    # Validate date range
+    if start_date > end_date:
+        st.error('Start date must be before or equal to end date')
+    else:
+        # Only show data when filters are applied
+        if st.session_state.filter_applied:
+            # Filter data
+            filtered_df = df.copy()
 
-        # Apply date filter
-        filtered_df = filtered_df[
-            (filtered_df['Date'].dt.date >= start_date) & 
-            (filtered_df['Date'].dt.date <= end_date)
-        ]
-        
-        if city != 'All Cities':
-            filtered_df = filtered_df[filtered_df['City'] == city]
-        if category != 'All Categories':
-            filtered_df = filtered_df[filtered_df['Category'] == category]
+            # Apply date filter
+            filtered_df = filtered_df[
+                (filtered_df['Date'].dt.date >= start_date) & 
+                (filtered_df['Date'].dt.date <= end_date)
+            ]
+            
+            if city != 'All Cities':
+                filtered_df = filtered_df[filtered_df['City'] == city]
+            if category != 'All Categories':
+                filtered_df = filtered_df[filtered_df['Category'] == category]
 
-        # Display data table
-        st.dataframe(
-            filtered_df,
-            column_config={
-                "ID": st.column_config.TextColumn("ID"),
-                "Date": st.column_config.DateColumn(
-                    "Date",
-                    format="MM/DD/YYYY"
-                ),
-                "Region": st.column_config.TextColumn("Region"),
-                "City": st.column_config.TextColumn("City"),
-                "Category": st.column_config.TextColumn("Category"),
-                "Product": st.column_config.TextColumn("Product"),
-                "Qty": st.column_config.NumberColumn("Qty"),
-                "UnitPrice": st.column_config.NumberColumn(
-                    "Unit Price ($)",
-                    format="$%.2f"
-                ),
-                "TotalPrice": st.column_config.NumberColumn(
-                    "Total Price ($)",
-                    format="$%.2f"
-                )
-            },
-            hide_index=True,
-            use_container_width=True
-        )
+            # Display data table
+            st.dataframe(
+                filtered_df,
+                column_config={
+                    "ID": st.column_config.TextColumn("ID"),
+                    "Date": st.column_config.DateColumn(
+                        "Date",
+                        format="MM/DD/YYYY"
+                    ),
+                    "Region": st.column_config.TextColumn("Region"),
+                    "City": st.column_config.TextColumn("City"),
+                    "Category": st.column_config.TextColumn("Category"),
+                    "Product": st.column_config.TextColumn("Product"),
+                    "Qty": st.column_config.NumberColumn("Qty"),
+                    "UnitPrice": st.column_config.NumberColumn(
+                        "Unit Price ($)",
+                        format="$%.2f"
+                    ),
+                    "TotalPrice": st.column_config.NumberColumn(
+                        "Total Price ($)",
+                        format="$%.2f"
+                    )
+                },
+                hide_index=True,
+                use_container_width=True
+            )
 
 else:
     st.error("Unable to load data. Please check if the Excel file exists in the correct location.")
